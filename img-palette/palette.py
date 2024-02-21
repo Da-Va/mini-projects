@@ -53,13 +53,14 @@ new_colors_sub[0,:] -= 2*0.16*dir_col
 new_colors_sub[0,:], new_colors[0,:] = 1*new_colors[0,:], 1*new_colors_sub[0,:]
 
 ## Assemble color matrix
-colors = np.zeros((3,8,3))
+colors = np.zeros((4,8,3))
 colors[0,:,:] = ansi_8_colors
-colors[1,:,:] = new_colors
-colors[2,:,:] = new_colors_sub
+colors[2,:,:] = new_colors
+colors[3,:,:] = new_colors_sub
 
 img_rgb = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_LAB2RGB)
 colors_rgb = cv2.cvtColor(colors.astype(np.uint8), cv2.COLOR_LAB2RGB)
+colors_rgb[1,:,:] = 255
 
 ## Plotting
 Hplt = 2
