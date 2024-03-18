@@ -99,9 +99,15 @@ if __name__ == '__main__':
     img_lab = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_RGB2LAB)
     palette_lab = cv2.cvtColor(palette.astype(np.uint8), cv2.COLOR_RGB2LAB)
     
-    for i in range(0):
-        print(f'Iteration: {i}')
-        img_lab = img_warp(img_lab, palette_lab)
+    for i in range(100):
+        print(f'Iteration: {i}', end='', flush=True)
+        img_tmp = img_warp(img_lab, palette_lab)
+        max_dist = np.linalg.norm(img_lab - img_tmp, axis=2).max()
+        img_lab = img_tmp
+        print(f' max diff {max_dist}')
+        if max_dist < 0.1:
+            break
+
     img = cv2.cvtColor(img_lab.astype(np.uint8), cv2.COLOR_LAB2RGB)
 
     ax = plt.subplot(2, 2, 1)
