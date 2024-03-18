@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+from copy import deepcopy
 import sys
 
 ANSI_8_COLORS = np.array([
@@ -92,6 +93,7 @@ if __name__ == '__main__':
     palette_fn = sys.argv[2]
 
     img = load_img_rgb(img_fn)
+    img_original = deepcopy(img)
     palette = load_palette(palette_fn)
 
     img_lab = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_RGB2LAB)
@@ -102,7 +104,9 @@ if __name__ == '__main__':
         img_lab = img_warp(img_lab, palette_lab)
     img = cv2.cvtColor(img_lab.astype(np.uint8), cv2.COLOR_LAB2RGB)
 
-    ax = plt.subplot(1, 2, 1)
+    ax = plt.subplot(2, 2, 1)
+    ax.imshow(img_original)
+    ax = plt.subplot(2, 2, 3)
     ax.imshow(img)
 
     sample_idx = np.random.permutation(img.size//3)[:5000]
