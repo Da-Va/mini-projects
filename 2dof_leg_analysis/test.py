@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 from math import sin, cos, sqrt, ceil
+N=1000
+M = 3
 
 def multi_plot():
     plot_funs = []
@@ -43,65 +45,43 @@ def ik(x, y):
     
     return a1, a2
 
-N=2000
-M = 2.5
-
-L1 = 1
-L2 = 1.0
-
-Y_slice = 0
-        
-
-XX, YY = np.meshgrid(np.linspace(-M, M, N), np.linspace(-M, M, N))
-
-A1, A2 = ik(XX, YY)
-
-Lx = np.abs(XX) + np.abs(XX - np.cos(A1))
-Ly = np.abs(YY) + np.abs(YY - np.sin(A1))
-
-
-# A2[A1>np.pi/2] = np.nan
-# A2[A1<-0] = np.nan
-# A1[A1>np.pi/2] = np.nan
-# A1[A1<-0] = np.nan
-
-Lx[np.isnan(A1)] = np.nan
-Ly[np.isnan(A1)] = np.nan
-
-x, y = 2.5,0 
-
-a1,a2 = ik(x,y)
-
-lx = abs(x) + abs(x - cos(a1))
-ly = abs(y) + abs(y - sin(a1))
-
-LB = np.maximum(
-    np.abs(XX - x) * 1/lx,
-    np.abs(YY - y) * 1/ly
-)
-
-def no_plot_3d_3_joint_ik_distance(ax):
-    ax.plot_surface(XX,YY,
-        np.maximum(
-            np.maximum(np.abs(A1-a1), np.abs(A2-a2)),
-            0*np.maximum(np.abs(x-XX),np.abs(y-YY))
-        ), cmap=cm.viridis)
-
-def plot_3d_1_joint_2(ax):
-    ax.plot_surface(XX,YY,(A2-np.pi/2), cmap=cm.viridis)
-def plot_3d_2_joint_1(ax):
-    ax.plot_surface(XX,YY,(A1), cmap=cm.viridis)
-def plot_3d_2_atan(ax):
-    ax.plot_surface(XX,YY,np.abs(np.arctan2(YY, XX)), cmap=cm.viridis)
+def main(argv):
+    XX, YY = np.meshgrid(np.linspace(-0, M, N), np.linspace(-M, 0, N))
     
-def no_plot_2d_1_joint_ik_distance(ax):
-    ax.axis('equal')
-    ax.contourf(XX,YY,
-        np.maximum(
-            np.maximum(np.abs(A1-a1), np.abs(A2-a2)),
-            0*np.maximum(np.abs(x-XX),np.abs(y-YY))
-        ),levels=100, cmap=cm.viridis)
+    A1, A2 = ik(XX, YY)
+    
+    Lx = np.abs(XX) + np.abs(XX - np.cos(A1))
+    Ly = np.abs(YY) + np.abs(YY - np.sin(A1))
+    
+    # A2[A1>np.pi/2] = np.nan
+    # A2[A1<-0] = np.nan
+    # A1[A1>np.pi/2] = np.nan
+    # A1[A1<-0] = np.nan
 
+    Lx[np.isnan(A1)] = np.nan
+    Ly[np.isnan(A1)] = np.nan
+    
+    # IE = np.ones(XX.shape) * np.sum(np.abs(Lx))
+    
+    # ax = plt.subplot(1,3,3) 
+    # ax.axis('equal')
+    # ax.scatter(0,0)
+    # c = ax.contourf(XX, YY, IE, levels=60)
+    # plt.colorbar(c, ax=ax)
+    
+    ax = plt.subplot(1,2,1) 
+    ax.axis('equal')
+    c = ax.contourf(XX, YY, Lx, levels=60)
+    plt.colorbar(c, ax=ax)
+    ax.scatter([0,L1,L1],[0,0,-L2], c='red')
+    ax.plot([0,L1,L1],[0,0,-L2], c='red')
+
+    ax = plt.subplot(1,2,2) 
+    ax.axis('equal')
+    c = ax.contourf(XX, YY, Ly, levels=60)
+    plt.colorbar(c, ax=ax)
+    ax.scatter([0,L1,L1],[0,0,-L2], c='red')
+    ax.plot([0,L1,L1],[0,0,-L2], c='red')
     
 multi_plot()
 

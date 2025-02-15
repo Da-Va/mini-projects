@@ -2,29 +2,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 
-# Define the differential equation: dy/dt = -2y + 1
+# PID constants
+P = -1
+I = 0
+D = -1.8
+
+# Define the differential equation: dy/dt
 def model(y, t):
-    # dydt = -2 * y + 1
-    P = -1
-    I = 0
-    D = -1.8
     ext = 1
     dydt = np.array([
-        # y'
+    # y'
         y[1],
-        # y''
+    # y''
         P * y[0] + D * y[1] + ext            
     ])
     return dydt
 
-# Initial condition: y(0) = 0
+# Initial condition: y(0)
 y0 = np.array([
     0,  # y
     0   # y'
 ])
 
 # Time points at which to solve the ODE
-t = np.linspace(0, 50, 1000)
+t = np.linspace(0, 15, 1000)
 
 # Solve the ODE
 y = odeint(model, y0, t)
