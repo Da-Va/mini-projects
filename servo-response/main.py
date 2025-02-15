@@ -3,13 +3,15 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 
 # PID constants
-P = -1
+P = -100
 I = 0
-D = -1.8
+D = -15
 
 # Define the differential equation: dy/dt
 def model(y, t):
     ext = 1
+    # ext =  1 - (t - 1)**2 if t < 1 else 1
+    ext *= 0.01
     dydt = np.array([
     # y'
         y[1],
@@ -25,14 +27,19 @@ y0 = np.array([
 ])
 
 # Time points at which to solve the ODE
-t = np.linspace(0, 15, 1000)
+t = np.linspace(0, 2, 1000)
 
 # Solve the ODE
 y = odeint(model, y0, t)
 
+y_d = np.array([ model(y, t) for y,t in zip(y, t) ])
+p_gain = P * y[:,0]
+
 # Plot the solution
 plt.plot(t, y[:,0], label='y(t)', color='b')
-plt.title('Solution of dy/dt = -2y + 1')
+plt.plot(t, y[:,1], label='y\'(t)', color='r')
+plt.plot(t, y_d[:,1], label='y\'\'(t)', color='g')
+plt.plot(t, p_gain, label='p_gain(t)', color='y')
 plt.xlabel('Time (t)')
 plt.ylabel('y(t)')
 plt.legend()
