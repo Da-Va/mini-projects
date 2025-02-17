@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 from math import sin, cos, sqrt, ceil
+N=1000
+M = 3
 
 def multi_plot():
     plot_funs = []
@@ -110,6 +112,12 @@ def no_plot_2d_1_joint_ik_distance(ax):
             0*np.maximum(np.abs(x-XX),np.abs(y-YY))
         ),levels=100, cmap=cm.viridis)
 
+    ax = plt.subplot(1,2,2) 
+    ax.axis('equal')
+    c = ax.contourf(XX, YY, Ly, levels=60)
+    plt.colorbar(c, ax=ax)
+    ax.scatter([0,L1,L1],[0,0,-L2], c='red')
+    ax.plot([0,L1,L1],[0,0,-L2], c='red')
     
 multi_plot()
 
