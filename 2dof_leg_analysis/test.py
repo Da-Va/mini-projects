@@ -68,7 +68,7 @@ Ly = np.abs(YY) + np.abs(YY - np.sin(A1))
 Lx[np.isnan(A1)] = np.nan
 Ly[np.isnan(A1)] = np.nan
 
-x, y = 2.5,0 
+x, y = 0.2, 0
 
 a1,a2 = ik(x,y)
 
@@ -87,11 +87,19 @@ def no_plot_3d_3_joint_ik_distance(ax):
             0*np.maximum(np.abs(x-XX),np.abs(y-YY))
         ), cmap=cm.viridis)
 
-def plot_3d_1_joint_2(ax):
-    ax.plot_surface(XX,YY,(A2-np.pi/2), cmap=cm.viridis)
-def plot_3d_2_joint_1(ax):
+# def plot_3d_1_joint_2(ax):
+#     ax.plot_surface(XX,YY,(A2-np.pi/2), cmap=cm.viridis)
+# def plot_3d_2_joint_1(ax):
     ax.plot_surface(XX,YY,(A1), cmap=cm.viridis)
-def plot_3d_2_atan(ax):
+
+def plot_2d_1_joint_2(ax):
+    ax.contourf(XX,YY,(A2-np.pi/2), cmap=cm.viridis, levels=100)
+def plot_2d_2_joint_1(ax):
+    ax.contourf(XX,YY,(A1), cmap=cm.viridis, levels=100)
+def plot_2d_2_joint_3(ax):
+    ax.contourf(XX,YY,(A1+A2), cmap=cm.viridis, levels=100)
+
+def no_plot_3d_2_atan(ax):
     ax.plot_surface(XX,YY,np.abs(np.arctan2(YY, XX)), cmap=cm.viridis)
     
 def no_plot_2d_1_joint_ik_distance(ax):
