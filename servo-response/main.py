@@ -1,26 +1,26 @@
-import math
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
+from scipy.integrate import solve_ivp
 
 # PID constants
-P = -5000
-I = -10000
-D = -500
+P = -500
+I = -0
+D = -100
 
-t0 = 0
-T = 10
 M = 1.0
 
-aew = 0.1
+t_span = (-1,2)
+t_max_step = 0.01
 
+# External force
 def ext(t):
-    q = .0
-    ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1 if t >= 0 else 0
+    # q = .0
+    # ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1 if t >= 0 else 0
+    ext =  1 if 0 <= t <= 0.5 or 1 <= t <= 1.5 else 0
     return ext
 
 # Define the differential equation: dy/dt
-def model(y, t):
+def model(t, y):
     dydt = np.array([
     # y'
         y[1],
@@ -34,39 +34,34 @@ def model(y, t):
 # Initial condition: y(0)
 y0 = np.array([
     0,  # y
-    0,   # y'
+    0,  # y'
     0   # int y dt
 ])
 
-# Time points at which to solve the ODE
-t = np.linspace(t0, T, 1000)
-
 # Solve the ODE
-y = odeint(model, y0, t)
+solution = solve_ivp(model, t_span, y0, max_step=t_max_step)
+y = solution.y.T
+t = solution.t
 
-y_d = np.array([ model(y, t) for y,t in zip(y, t) ])
+# Extracted data
+y_d = np.array([ model(t, y) for t,y in zip(t, y) ])
 p_gain_estim = -P * y[:,0]
 pid_gain = -P * y[:,0] - D * y[:,1] - I * y[:,2] #+ y_d[:,1]
-s = max(1, int(aew/(t[1]-t[0])))
-acc_estim = np.array([ (y[i,1] - y[i-s,1] if i > s else y[i,1])/(s*(t[1]-t[0])) for i in range(t.size) ])
 p_gain = -P * y[:,0]
 d_gain = -D * y[:,1]
-
 F_ext = np.array([ext(t) for t in t])
 
-# Plot the solution
-# plt.plot(t, 10*y[:,0], label='10y(t)', color='b')
+# Plot data
 plt.plot(t, y[:,0], label='y(t)', color='teal')
 plt.plot(t, y[:,1], label='y\'(t)', color='r')
 plt.plot(t, y_d[:,1], label='y\'\'(t)', color='g')
 plt.plot(t, pid_gain, label='pid_gain(t)', color='purple')
 # plt.plot(t, pid_gain+M*acc_estim, label='pid_gain(t) + M*acc_sctim', color='teal')
-# plt.plot(t, acc_estim, label='acc_estim', color='purple')
 plt.plot(t, p_gain, label='Py(t)', color='y')
 # plt.plot(t, d_gain, label='Dy\'(t)', color='pink')
 plt.plot(t, F_ext, label='F_ext', color='black')
 plt.xlabel('Time (t)')
-plt.ylabel('y(t)')
+plt.ylabel('y(t) et al.')
 plt.legend()
 plt.grid(True)
 plt.show()
