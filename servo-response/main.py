@@ -3,20 +3,24 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 # PID constants
-P = -500
+P = -100
 I = -0
-D = -100
+D = -10
 
 M = 1.0
 
 t_span = (-1,2)
 t_max_step = 0.01
 
+t_transition = 0.1
+
 # External force
 def ext(t):
     # q = .0
+    ext = 1. if t >= 0. else 0.
+    # ext = 1. if t >= t_transition else 1-np.abs(t-t_transition)**1/t_transition**1 if t >= 0  else 0.
     # ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1 if t >= 0 else 0
-    ext =  1 if 0 <= t <= 0.5 or 1 <= t <= 1.5 else 0
+    # ext =  1 if 0 <= t <= 0.5 or 1 <= t <= 1.5 else 0
     return ext
 
 # Define the differential equation: dy/dt
@@ -43,19 +47,29 @@ solution = solve_ivp(model, t_span, y0, max_step=t_max_step)
 y = solution.y.T
 t = solution.t
 
+y_noise = y + 0.001*(2*np.random.random(y.shape)-1)
+
 # Extracted data
 y_d = np.array([ model(t, y) for t,y in zip(t, y) ])
 p_gain_estim = -P * y[:,0]
-pid_gain = -P * y[:,0] - D * y[:,1] - I * y[:,2] #+ y_d[:,1]
+# pid_gain = -P * y[:,0] - D * y[:,1] - I * y[:,2] #+ y_d[:,1]
+pid_gain = -P * y_noise[:,0] - D * y_noise[:,1] - I * y_noise[:,2] #+ y_d[:,1]
 p_gain = -P * y[:,0]
 d_gain = -D * y[:,1]
 F_ext = np.array([ext(t) for t in t])
 
+tde = 1
+y_d_estim = (y_noise[:-tde,:] - y_noise[tde:,:])/np.reshape(t[:-tde]-t[tde:], (-1,1))
+y_d_estim[:10,:] = 0.   # Corrects artifacts near the start.
+
 # Plot data
 plt.plot(t, y[:,0], label='y(t)', color='teal')
 plt.plot(t, y[:,1], label='y\'(t)', color='r')
+# plt.plot(t, -P*y_noise[:,0], label='Py_noise(t)', color='black')
 plt.plot(t, y_d[:,1], label='y\'\'(t)', color='g')
+# plt.plot(t[tde:], y_d_estim[:,1], label='y\'\'_estim(t)', color='red')
 plt.plot(t, pid_gain, label='pid_gain(t)', color='purple')
+plt.plot(t[tde:], pid_gain[tde:] + y_d_estim[:, 1], label='pid_gain(t) + m*y\'\'_extim', color='blue')
 # plt.plot(t, pid_gain+M*acc_estim, label='pid_gain(t) + M*acc_sctim', color='teal')
 plt.plot(t, p_gain, label='Py(t)', color='y')
 # plt.plot(t, d_gain, label='Dy\'(t)', color='pink')
