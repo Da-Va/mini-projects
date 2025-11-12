@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 10
+N = 4
 SAMPLING = 100
 
 
@@ -17,9 +17,9 @@ def main():
     ddP1 = hodograph(dP1)
 
         
-    # P2 = P1 + 0.01 * (2*np.random.random(P1.shape) - 1)
-    P2 = P1
-    P2[:,-1] += 0.01*(2*np.random.random((2,)) - 1)
+    P2 = P1 + 0.01 * (2*np.random.random(P1.shape) - 1)
+    # P2 = 1*P1
+    # P2[:,-1] += 0.01*(2*np.random.random((2,)) - 1)
 
 
     dP2 = hodograph(P2)
@@ -39,6 +39,7 @@ def main():
     ax.plot(pi1[0,:], pi1[1,:])
     ax.scatter(P2[0,:], P2[1,:])
     ax.plot(pi2[0,:], pi2[1,:])
+    ax.plot(pi2[0,:]-pi1[0,:], pi2[1,:]-pi1[1,:])
 
     ax = plt.subplot(1, 3, 2)
     ax.set_aspect('equal')
@@ -47,13 +48,14 @@ def main():
     ax.scatter(dP2[0,:], dP2[1,:])
     ax.scatter([0],[0])
     ax.plot(dpi2[0,:], dpi2[1,:])
+    ax.plot(dpi2[0,:]-dpi1[0,:], dpi2[1,:]-dpi1[1,:])
 
     ax = plt.subplot(1, 3, 3)
     ax.set_aspect('equal')
-    # ax.scatter(ddP1[0,:], ddP1[1,:])
-    # ax.plot(ddpi1[0,:], ddpi1[1,:])
-    # ax.scatter(ddP2[0,:], ddP2[1,:])
-    # ax.plot(ddpi2[0,:], ddpi2[1,:])
+    ax.scatter(ddP1[0,:], ddP1[1,:])
+    ax.plot(ddpi1[0,:], ddpi1[1,:])
+    ax.scatter(ddP2[0,:], ddP2[1,:])
+    ax.plot(ddpi2[0,:], ddpi2[1,:])
     ax.scatter([0],[0])
     ax.plot(ddpi2[0,:]-ddpi1[0,:], ddpi2[1,:]-ddpi1[1,:])
     

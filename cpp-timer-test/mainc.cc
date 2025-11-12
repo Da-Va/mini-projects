@@ -52,8 +52,7 @@ int main() {
         return 1;
     }
 
-    // Set the timer to expire every 1 second
-
+    // Set the timer.
     struct itimerspec its;
     its.it_value.tv_sec = 0;  // Initial expiration
     its.it_value.tv_nsec = int(PERIOD_NS);

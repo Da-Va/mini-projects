@@ -3,20 +3,21 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 # PID constants
-P = -500
+P = -1
 I = -0
-D = -100
+D = -1.9
 
 M = 1.0
 
-t_span = (-1,2)
+t_span = (-0,50)
 t_max_step = 0.01
 
 # External force
 def ext(t):
-    # q = .0
+    q = .0
     # ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1 if t >= 0 else 0
-    ext =  1 if 0 <= t <= 0.5 or 1 <= t <= 1.5 else 0
+    # ext =  1 #if 0 <= t <= 0.5 else 0 # or 1 <= t <= 1.5 else 0
+    ext = 1#min(t, 1)
     return ext
 
 # Define the differential equation: dy/dt
