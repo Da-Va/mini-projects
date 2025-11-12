@@ -3,15 +3,9 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 # PID constants
-<<<<<<< HEAD
 P = -1
 I = -0
 D = -1.9
-=======
-P = -100
-I = -0
-D = -10
->>>>>>> 05f7c55c09a8ac2431238fe057cf10393a1ada3f
 
 M = 1.0
 
@@ -22,18 +16,10 @@ t_transition = 0.1
 
 # External force
 def ext(t):
-<<<<<<< HEAD
     q = .0
     # ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1 if t >= 0 else 0
     # ext =  1 #if 0 <= t <= 0.5 else 0 # or 1 <= t <= 1.5 else 0
     ext = 1#min(t, 1)
-=======
-    # q = .0
-    ext = 1. if t >= 0. else 0.
-    # ext = 1. if t >= t_transition else 1-np.abs(t-t_transition)**1/t_transition**1 if t >= 0  else 0.
-    # ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1 if t >= 0 else 0
-    # ext =  1 if 0 <= t <= 0.5 or 1 <= t <= 1.5 else 0
->>>>>>> 05f7c55c09a8ac2431238fe057cf10393a1ada3f
     return ext
 
 # Define the differential equation: dy/dt
