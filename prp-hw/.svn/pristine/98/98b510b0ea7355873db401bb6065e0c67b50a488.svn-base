@@ -1,0 +1,163 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <assert.h>
+#include <ctype.h>
+
+#define loop while(1)
+
+#define PRIME_LIMIT 1000000
+typedef uint32_t prime_t;
+
+#define SUCCESS 0
+#define ERROR_INPUT 100
+#define ERROR_DECOMPOSITION 110
+
+#define HIGH_WORD_64(B) B >> 32;
+#define LOW_WORD_64(B) 0x00000000ffffffff & B;
+
+#define LARGE_INT_CELL_COUNT 11  // Should be enough to hold numbers of the order 1e100.
+typedef struct {
+    uint32_t cells[LARGE_INT_CELL_COUNT];   // Little-endian ordering is used.
+} large_int_t;
+
+uint32_t add_to_cell(uint32_t *cell, uint32_t a)
+{
+    uint64_t buffer = *cell + a;
+
+    *cell = LOW_WORD_64(buffer); 
+    return HIGH_WORD_64(buffer);
+}
+uint32_t mult_cell(uint32_t *cell, uint32_t a)
+{
+    uint64_t buffer = *cell * a;
+
+    *cell = LOW_WORD_64(buffer); 
+    return HIGH_WORD_64(buffer);
+}
+
+void add_to_large_int(large_int_t *large_number, uint32_t a)
+{
+    uint32_t overflow = add_to_cell(&large_number->cells[0], a);
+    for(int i = 1; i < LARGE_INT_CELL_COUNT && overflow > 0; ++i) {
+        overflow = add_to_cell(&large_number->cells[i], overflow);
+    }
+    assert(overflow == 0);
+}
+
+void mult_large_int(large_int_t *large_number, uint32_t a)
+{
+    uint32_t overflow = mult_cell(large_number->cells[0], a);        
+    for(int i = 1; i < LARGE_INT_CELL_COUNT; ++i) {
+        overflow = add_to_cell(large_number->cells[i], overflow);
+        overflow += add_to_cell(large_number->cells[i], a);
+    }     
+    assert(overflow == 0);
+}
+
+int skip_whitespaces_and_peek()
+{
+    int c; 
+    while(isspace(c = getchar()));
+    ungetc(c, stdin);
+    return c;
+}
+
+bool load_large_int(large_int_t *out)
+{
+    for(int i = 0; i < LARGE_INT_CELL_COUNT; ++i) {
+        out->cells[i] = 0;
+    }
+    
+    int first_char = skip_whitespaces_and_peek();
+    if(!isdigit(first_char)) {
+        return false;
+    }
+    
+    loop {
+        int c = getchar();
+        if(!isdigit(c)) {
+            break; 
+        }
+
+        
+    }
+    
+    return true;
+}
+
+
+prime_t find_primes(prime_t array[], prime_t limit)
+{
+    prime_t n_primes = 0;
+    for(prime_t i = 0; i < limit; ++i) {
+        array[i] = 1;
+    }     
+    for(prime_t i = 2; i < limit; ++i) {
+        if (array[i]) {
+            array[n_primes++] = i;
+            for(prime_t j = i+i; j < limit; j+=i) {
+                array[j] = 0;                 
+            }
+        }
+    }     
+    return n_primes;
+}
+
+uint64_t print_decomposition(uint64_t number, prime_t primes[], prime_t n_primes)
+{
+    printf("Prvociselny rozklad cisla %lu je:\n", number);
+
+    if(number == 1) {
+        printf("1\n");
+        return 1;
+    }
+    
+    for(int pi = 0; pi < n_primes && number > 1; ++pi) {
+        prime_t prime = primes[pi];
+        int power = 0;
+        while (number % prime == 0) {
+            power += 1;            
+            number = number / prime;
+        }
+
+        if(power > 0)  {
+            printf("%d", prime);            
+            if(power > 1) {
+                printf("^%d", power);
+            }
+            if(number > 1) {
+                printf(" x ");
+            }
+        }
+    } 
+    putchar('\n');
+    return number;
+}
+
+int main()
+{
+    prime_t primes[PRIME_LIMIT];
+    prime_t n_primes = find_primes(primes, PRIME_LIMIT);
+    
+    loop {
+        uint64_t number;
+        if(scanf("%lu", &number) != 1 || number < 0) {
+            fprintf(stderr, "Error: Chybny vstup!\n");
+            return ERROR_INPUT;
+        }
+        printf("number: %lu\n", number);
+        if (number == 0) break;
+        
+        uint64_t r = print_decomposition(number, primes, n_primes);
+        printf("Remainder: %lu\n", r);
+        if(r > 1) {
+            fprintf(stderr,
+                "Error: Decomposition of %lu, contains a prime larger than %d\n",
+                number, PRIME_LIMIT);
+            return ERROR_DECOMPOSITION;
+        }
+    } 
+
+    return SUCCESS;    
+}

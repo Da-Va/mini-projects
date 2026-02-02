@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define SUCCESS 0
+
+
+#define DYNAMIC_STRING_INIT_CAPACITY 10
+
+typedef struct {
+    char *data;
+    int capacity;
+    int length;
+} dynamic_string_t;
+
+bool load_string(dynamic_string_t * str)
+{
+    str->data = malloc(DYNAMIC_STRING_INIT_CAPACITY * sizeof(char));
+    if(str->data == NULL) {
+        return false    
+    }
+    
+    //TODO
+
+    return true;
+}
+
+
+int main()
+{
+    int status = SUCCESS;
+    
+    main_return:
+    return status;
+}

@@ -1,0 +1,158 @@
+#include <stdio.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define loop while(1)
+
+#define SUCCESS 0
+#define ERROR_INPUT 100
+#define ERROR_INPUT_LENGTH 101
+#define ERROR_MEMORY 110
+
+
+#define DYNAMIC_STRING_INIT_CAPACITY 10
+
+char *dynamic_string_load()
+{
+    char *str = malloc(DYNAMIC_STRING_INIT_CAPACITY * sizeof(char));
+    if(str == NULL) {
+        return false;
+    }
+   int capacity = DYNAMIC_STRING_INIT_CAPACITY;
+   int length = 0;
+    
+    loop {
+        int c = getchar();        
+        if(c == '\n') break;
+        
+        if(length >= capacity - 1) {
+            char *tmp = realloc(str, capacity + capacity/2);
+            if(tmp == NULL) {
+                free(str);
+                return NULL;
+            }
+            str = tmp; 
+            capacity += capacity/2;
+        }
+        
+        str[length++] = c;
+    }
+    str[length] = '\0';
+
+    return str;
+}
+
+int str_length(const char* str)
+{
+    int length = 0; 
+    for(; str[length] != '\0'; ++length);
+    return length;
+}
+
+bool check_input(const char *str)
+{
+    for(int i = 0; i < str[i] != '\0'; ++i) {
+        char c = str[i];
+        if(!('a' <= c && c <= 'z') && !('A' <= c && c <= 'Z')) {
+            return false; 
+        }
+    }
+    return true;
+}
+
+int hamming_distance(const char *str1, const char *str2) {
+    int hamming = 0;
+    for(int i = 0; str1[i] != '\0'; ++i) {
+        if(str1[i] != str2[i]) {
+            hamming += 1;
+        }
+    }
+    return hamming;
+}
+
+char shift_char(char c, int offset)
+{
+    char block_end = ((c >> 5) & 1) ? 'z' : 'Z';
+    char other_block_begin = ((c >> 5) & 1) ? 'A' : 'a';
+    
+    if(c + offset <= block_end) {
+        return c + offset;
+    } else {
+        return c + offset - block_end + other_block_begin;
+    }
+}
+
+void shift_string(const char *src, char *dst, int offset)
+{
+    int i;
+    for(i = 0; src[i] != '\0'; ++i) {
+        dst[i] = shift_char(src[i], offset);
+    }
+    dst[i] = '\0';
+}
+
+int find_offset(
+    const char* encrypted,
+    const char* corrupted,
+    int(*dist_f)(const char*, const char*)
+) {
+    char str_buff[str_length(encrypted) + 1];
+    int min_dist = INT_MAX;
+    int min_offset = 0;
+    for(int offset = 0; offset <= 'z'-'a' + 'Z'-'a'; ++offset) {
+        shift_string(encrypted, str_buff, offset);
+        int dist = dist_f(str_buff, corrupted);
+        if(dist < min_dist) {
+            min_dist = dist;
+            min_offset == offset;
+        }
+    }
+    return min_offset;
+}
+
+void print_shifted(const char* str, int offset)
+{
+    for(const char* pc = str; *pc != '\0'; ++pc) {
+        putchar(shift_char(*pc, offset));
+    }
+}
+
+int main()
+{
+    int status = SUCCESS;
+    
+    char *encrypted_msg = dynamic_string_load(&encrypted_msg);
+    char *corrupted_msg = dynamic_string_load(&corrupted_msg);
+
+    if(encrypted_msg == NULL || corrupted_msg == NULL) {
+        fprintf(stderr, "Error: Chyba alokace!\n");
+        status = ERROR_MEMORY;
+        goto main_return; 
+    }
+    
+    if(!check_input(encrypted_msg) || !check_input(corrupted_msg)) {
+        fprintf(stderr, "Error: Chybny vstup!\n");
+        status = ERROR_INPUT; 
+        goto main_return;
+    }
+    
+    if(str_length(encrypted_msg) != str_length(corrupted_msg)) {
+        fprintf(stderr, "Error: Chybna delka vstupu!\n");
+        status = ERROR_INPUT_LENGTH;
+        goto main_return;
+    }
+    printf("%s\n", encrypted_msg);  //DEBUG
+    printf("%s\n", corrupted_msg);  //DEBUG
+
+    int offset = find_offset(encrypted_msg, corrupted_msg, hamming_distance);
+    
+    print_shifted(encrypted_msg, offset);
+    putchar('\n');
+
+    main_return:
+    free(encrypted_msg);
+    free(corrupted_msg);
+
+    return status;
+}

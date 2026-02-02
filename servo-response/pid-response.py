@@ -4,7 +4,7 @@ from scipy.integrate import solve_ivp
 
 # PID constants
 P = -10.0
-D = -20.0
+D = -10.0
 I = -0.0
 
 # mass
@@ -22,7 +22,7 @@ def ext(t):
     ext =  1 - (1/q**2)*(t - q)**2 if t < q else 1
     # ext = min(1.0*t,1)
     # ext=np.sin(0.3*t)
-    ext = 1 + 0.2*np.exp(-2*t)*np.sin(10*t)
+    # ext = 1 + 0.2*np.exp(-2*t)*np.sin(10*t)
     return ext
 
 # Define the differential equation: dy/dt
