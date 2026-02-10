@@ -11,7 +11,7 @@ I = -0.0
 M = 1.0
 
 # t
-t_span = (-5,20)
+t_span = (-2,5)
 t_max_step = 0.01
 
 # External force
@@ -65,19 +65,19 @@ y_d_estim = (y_noise[:-tde,:] - y_noise[tde:,:])/np.reshape(t[:-tde]-t[tde:], (-
 y_d_estim[:10,:] = 0.   # Corrects artifacts near the start.
 
 # Plot data
-plt.plot(t, y[:,0], label='y(t)', color='teal')
-plt.plot(t, y[:,1], label='y\'(t)', color='r')
+# plt.plot(t, y[:,0], label='y(t)', color='teal')
+# plt.plot(t, y[:,1], label='y\'(t)', color='r')
 # plt.plot(t, -P*y_noise[:,0], label='Py_noise(t)', color='black')
-plt.plot(t, y_d[:,1], label='y\'\'(t)', color='g')
+plt.plot(t, y_d[:,1], label=r'$m\ddot{y}$', color='g')
 # plt.plot(t[tde:], y_d_estim[:,1], label='y\'\'_estim(t)', color='red')
-plt.plot(t, pid_gain, label='pid_gain(t)', color='purple')
 # plt.plot(t[tde:], pid_gain[tde:] + y_d_estim[:, 1], label='pid_gain(t) + m*y\'\'_extim', color='blue')
 # plt.plot(t, pid_gain+M*acc_estim, label='pid_gain(t) + M*acc_sctim', color='teal')
-plt.plot(t, p_gain, label='Py(t)', color='y')
-# plt.plot(t, d_gain, label='Dy\'(t)', color='pink')
-plt.plot(t, F_ext, label='F_ext', color='black')
-plt.xlabel('Time (t)')
-plt.ylabel('y(t) et al.')
+plt.plot(t, p_gain, label=r'$Py$', color='y')
+plt.plot(t, d_gain, label=r'$D\dot{y}$', color='pink')
+plt.plot(t, F_ext, label=r'$F_\mathrm{ext}$', color='black')
+plt.plot(t, pid_gain, label=r'$Py + D\dot{y}$', color='purple')
+plt.xlabel('Time')
+plt.ylabel('Force')
 plt.legend()
 plt.grid(True)
 plt.show()
